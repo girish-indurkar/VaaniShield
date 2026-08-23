@@ -1,116 +1,190 @@
-# VaaniShield — Real-Time Voice Cloning Detection (SIH Project)
+# VaaniShield
 
-Two folders:
-- `voiceshield/` — Next.js frontend (the dashboard UI)
-- `voiceshield-backend/` — Python FastAPI backend (detection engine + multilingual STT)
+VaaniShield is an innovative application designed to protect users from social engineering scams by detecting synthetic or cloned speech and identifying risky conversational contexts in audio inputs. It combines real-time voice authenticity analysis with multilingual speech-to-text transcription and contextual risk assessment to flag suspicious activity.
 
----
+## Table of Contents
 
-## 1. Backend Setup (do this first)
+-   [Features](#features)
+-   [Tech Stack](#tech-stack)
+-   [Project Structure](#project-structure)
+-   [Installation](#installation)
+    -   [Prerequisites](#prerequisites)
+    -   [Backend Setup](#backend-setup)
+    -   [Frontend Setup](#frontend-setup)
+-   [Usage](#usage)
+    -   [Running the Application](#running-the-application)
+    -   [API Usage](#api-usage)
+-   [Contributing](#contributing)
+-   [License](#license)
 
-```bash
-cd voiceshield-backend
-python3 -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+## Features
+
+VaaniShield offers a robust set of features to combat voice-based scams:
+
+*   **Real-time Voice Authenticity Detection**: Employs classic Digital Signal Processing (DSP) features (pitch jitter, shimmer, spectral flatness) for fast, CPU-efficient, and offline anti-spoofing analysis to identify synthetic/cloned speech.
+*   **Multilingual Speech-to-Text Transcription**: Utilizes OpenAI's Whisper model to transcribe audio in English, Hindi, and Marathi.
+*   **Contextual Risk Assessment**: Scans transcribed text for keywords commonly associated with social engineering scams to provide a contextual risk score.
+*   **Web-based User Interface**: A modern Next.js application allows users to easily upload audio files and visualize real-time analysis results, including authenticity scores, transcripts, and contextual risk flags.
+*   **Explainable Detection**: Provides human-readable reasons for flagging audio, mapping DSP features to identifiable voice characteristics.
+*   **Programmatic API Access**: Exposes a FastAPI endpoint for seamless integration into other systems for audio analysis.
+*   **Test Audio Generation**: Includes a utility script to create synthetic 'natural-like' and 'cloned-like' audio samples for testing and development.
+
+## Tech Stack
+
+VaaniShield is built using a modern full-stack architecture:
+
+**Backend:**
+*   **Language**: Python
+*   **Framework**: FastAPI
+*   **Server**: Uvicorn
+*   **Speech-to-Text**: OpenAI Whisper
+*   **Audio Processing**: Librosa, NumPy, SciPy, SoundFile (for DSP feature extraction)
+
+**Frontend:**
+*   **Language**: TypeScript
+*   **Framework**: Next.js
+*   **Library**: React
+*   **Styling**: Tailwind CSS
+*   **Audio Visualization**: Web Audio API (inferred for waveform display)
+
+## Project Structure
+
+The repository is organized into two main parts: `backend` for the API and detection logic, and `frontend` for the user interface.
+
+```
+VaaniShield/
+├── backend/
+│   ├── app/
+│   │   ├── detection.py        # Core voice authenticity detection logic
+│   │   ├── main.py             # FastAPI application entry point
+│   │   └── transcript.py       # Speech-to-text and contextual risk assessment
+│   ├── generate_test_audio.py  # Script to generate synthetic test audio
+│   ├── requirements.txt        # Python dependencies
+│   └── test_audio/             # Sample test audio files
+├── frontend/
+│   ├── app/                    # Next.js pages and root layout
+│   │   ├── page.tsx            # Main application page
+│   │   └── layout.tsx          # Root layout
+│   ├── components/             # Reusable React components (e.g., Waveform, RiskGauge)
+│   ├── lib/                    # Frontend utility functions
+│   ├── public/                 # Static assets
+│   ├── package.json            # Node.js dependencies
+│   └── ...                     # Other Next.js configuration files
+└── README.md
 ```
 
-Run the server:
+## Installation
+
+Follow these steps to set up and run VaaniShield locally.
+
+### Prerequisites
+
+*   **Python 3.8+**
+*   **Node.js (LTS recommended)** and **npm** or **yarn**
+*   **Git**
+
+### Backend Setup
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/girish-indurkar/VaaniShield.git
+    cd VaaniShield
+    ```
+
+2.  **Navigate to the backend directory:**
+    ```bash
+    cd backend
+    ```
+
+3.  **Create and activate a virtual environment:**
+    ```bash
+    python -m venv venv
+    # On Windows
+    .\venv\Scripts\activate
+    # On macOS/Linux
+    source venv/bin/activate
+    ```
+
+4.  **Install Python dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### Frontend Setup
+
+1.  **Navigate back to the project root and then to the frontend directory:**
+    ```bash
+    cd ..
+    cd frontend
+    ```
+
+2.  **Install Node.js dependencies:**
+    ```bash
+    npm install
+    # Or if you prefer yarn
+    # yarn install
+    ```
+
+## Usage
+
+### Running the Application
+
+To run the full VaaniShield application, you need to start both the backend API and the frontend web server.
+
+1.  **Start the Backend API:**
+    Open a new terminal, navigate to the `backend` directory, activate your virtual environment, and run the FastAPI server:
+    ```bash
+    cd VaaniShield/backend
+    # Activate virtual environment (if not already active)
+    # On Windows: .\venv\Scripts\activate
+    # On macOS/Linux: source venv/bin/activate
+    uvicorn app.main:app --reload --port 8000
+    ```
+    The backend API will be running at `http://localhost:8000`.
+
+2.  **Start the Frontend Web Server:**
+    Open another new terminal, navigate to the `frontend` directory, and start the Next.js development server:
+    ```bash
+    cd VaaniShield/frontend
+    npm run dev
+    # Or if you used yarn
+    # yarn dev
+    ```
+    The frontend application will be available in your browser at `http://localhost:3000`.
+
+    You can now upload audio files via the web interface and see the authenticity detection, transcription, and risk assessment results.
+
+### API Usage
+
+For developers, you can interact directly with the backend API. The main endpoint is `/analyze`.
+
+**Endpoint:** `POST /analyze`
+
+**Parameters:**
+*   `file`: An audio file (form-data)
+*   `language`: The language of the audio (form-data, `en` for English, `hi` for Hindi, `mr` for Marathi). Defaults to `en`.
+
+**Example using `curl`:**
+
 ```bash
-uvicorn app.main:app --reload --port 8000
-```
-
-Check it's alive: open `http://localhost:8000/health` in a browser → should show `{"status":"ok"}`
-
-> ⚠️ First time you run `/analyze`, Whisper will auto-download its model
-> (~75MB for "tiny") — you need internet for that ONE time only. If you're
-> on flaky hackathon WiFi, do this at home the night before so it's cached.
-
-### Test it directly (no frontend needed) — 2 ready-made test files included:
-
-```bash
-curl -X POST http://localhost:8000/analyze \
-  -F "file=@test_audio/sample_real_like.wav" \
+curl -X POST "http://localhost:8000/analyze" \
+  -H "accept: application/json" \
+  -F "file=@/path/to/your/audio.wav" \
   -F "language=en"
-
-curl -X POST http://localhost:8000/analyze \
-  -F "file=@test_audio/sample_cloned_like.wav" \
-  -F "language=en"
 ```
 
-`sample_real_like.wav` should score **low/safe**, `sample_cloned_like.wav`
-should score **high/risk**. These are synthetically generated demo files
-(programmatically made, since we can't ship real human recordings) — for
-your actual judge demo, swap in:
-- `sample_real_like.wav` → a real recording of your own voice
-- `sample_cloned_like.wav` → output from any free TTS/voice-clone tool
-  (ElevenLabs free tier, Coqui TTS, etc.) reading the same sentence
+Replace `/path/to/your/audio.wav` with the actual path to your audio file.
 
-This will look far more convincing live than synthetic tones.
+## Contributing
 
----
+We welcome contributions to VaaniShield! If you'd like to contribute, please follow these steps:
 
-## 2. Frontend Setup
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes and ensure they adhere to the project's coding standards.
+4.  Write clear, concise commit messages.
+5.  Submit a pull request with a detailed description of your changes.
 
-Open a **second terminal** (keep the backend running in the first one):
+## License
 
-```bash
-cd voiceshield
-npm install
-npm run dev
-```
-
-Open `http://localhost:3000`
-
-- Upload `sample_cloned_like.wav` → click **Run Analysis** → should show a
-  high red risk score with reasons listed.
-- Upload `sample_real_like.wav` → should show a low green/safe score.
-- If the backend isn't running, the app automatically falls back to demo
-  (mock) data and shows a small warning — so your demo never fully breaks
-  even if something goes wrong with the backend on stage.
-
----
-
-## 3. How It Works (for your presentation)
-
-1. **Voice authenticity engine** (`app/detection.py`) — extracts DSP
-   features (pitch jitter, amplitude shimmer, spectral flatness, high-freq
-   energy ratio) per 2-second chunk. These are well-documented indicators
-   used in anti-spoofing research to separate natural speech from
-   vocoder/TTS output.
-2. **Multilingual transcription** (`app/transcript.py`) — OpenAI Whisper,
-   supports Hindi / Marathi / English out of the box.
-3. **Context risk layer** — scans the transcript for scam-associated
-   phrases (OTP, urgent transfer, account freeze, etc.) in all 3 languages.
-4. **Composite score** — 70% voice signal + 30% context signal → single
-   0-100 risk score shown on the dashboard with full explainability.
-
-## 4. What To Say If Asked "Why not a deep learning model?"
-
-> "For the hackathon MVP we used an interpretable DSP-feature engine so the
-> whole pipeline runs offline, on CPU, in real time, with every score fully
-> explainable. Our architecture is designed so this layer is a drop-in
-> replacement for a trained neural countermeasure model (e.g. AASIST on
-> ASVspoof) in a production deployment — the API contract doesn't change."
-
----
-
-## 5. Folder Structure
-
-```
-voiceshield/                  # Next.js frontend
-  app/page.tsx                 # main dashboard
-  components/RiskGauge.tsx
-  components/Waveform.tsx
-  lib/analysis.ts              # mock + real backend call
-
-voiceshield-backend/          # FastAPI backend
-  app/main.py                  # /analyze endpoint
-  app/detection.py             # DSP-based voice authenticity engine
-  app/transcript.py            # Whisper STT + keyword risk scoring
-  test_audio/
-    sample_real_like.wav
-    sample_cloned_like.wav
-  generate_test_audio.py       # script that made the above 2 files
-  requirements.txt
-```
+This project is licensed under the MIT License. See the `LICENSE` file (if present) or the repository for full details.
