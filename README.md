@@ -54,20 +54,20 @@ The repository is organized into two main parts: `backend` for the API and detec
 VaaniShield/
 ├── backend/
 │   ├── app/
-│   │   ├── detection.py        # Core voice authenticity detection logic
-│   │   ├── main.py             # FastAPI application entry point
-│   │   └── transcript.py       # Speech-to-text and contextual risk assessment
-│   ├── generate_test_audio.py  # Script to generate synthetic test audio
-│   ├── requirements.txt        # Python dependencies
-│   └── test_audio/             # Sample test audio files
+│   │   ├── detection.py      
+│   │   ├── main.py           
+│   │   └── transcript.py     
+│   ├── generate_test_audio.py  
+│   ├── requirements.txt        
+│   └── test_audio/             
 ├── frontend/
-│   ├── app/                    # Next.js pages and root layout
-│   │   ├── page.tsx            # Main application page
-│   │   └── layout.tsx          # Root layout
-│   ├── components/             # Reusable React components (e.g., Waveform, RiskGauge)
-│   ├── lib/                    # Frontend utility functions
-│   ├── public/                 # Static assets
-│   ├── package.json            # Node.js dependencies
+│   ├── app/                    
+│   │   ├── page.tsx            
+│   │   └── layout.tsx          
+│   ├── components/             
+│   ├── lib/                    
+│   ├── public/                 
+│   ├── package.json            
 │   └── ...                     # Other Next.js configuration files
 └── README.md
 ```
